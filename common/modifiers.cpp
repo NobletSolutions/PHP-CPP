@@ -10,6 +10,7 @@
  *  @copyright 2014 Copernica BV
  */
 #include "includes.h"
+#include <php.h>
 
 /**
  *  Set up namespace
