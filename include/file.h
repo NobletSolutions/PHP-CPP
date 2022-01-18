@@ -6,8 +6,8 @@
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2014 Copernica BV
+ *
  */
-
 /**
  *  Forward declarations
  */
@@ -41,6 +41,15 @@ public:
      *  @param  name        the filename
      */
     File(const char *name) : File(name, ::strlen(name)) {}
+
+    /**
+     *  Alternative constructor with zend_string filename
+     *  and size of the string
+     *
+     *  @param  name        the filename
+     *  @param  size        size of the filename
+     */
+    File(const _zend_string *name, size_t size);
 
     /**
      *  Alternative constructor with a string object
@@ -88,7 +97,7 @@ private:
      *  The full resolved path name
      *  @var struct _zend_string*
      */
-    struct _zend_string *_path = nullptr;
+    struct _zend_string *_path = nullptr;  
 
     /**
      *  The opcodes of this file
@@ -108,3 +117,4 @@ private:
  *  End of namespace
  */
 }
+

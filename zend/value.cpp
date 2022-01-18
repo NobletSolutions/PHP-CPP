@@ -23,7 +23,10 @@
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 - 2019 Copernica BV
+ *  
+ *  
  */
+
 #include "includes.h"
 #include "string.h"
 #include "lowercase.h"
@@ -162,7 +165,7 @@ Value::Value(struct _zval_struct *val, bool ref)
         // increment refcount
         ++GC_REFCOUNT(ref);
 #else
-	// increment refcount
+    // increment refcount
         GC_ADDREF(ref);
 #endif
         // store the reference in our value
@@ -314,7 +317,7 @@ Php::Zval Value::detach(bool keeprefcount)
 void Value::invalidate()
 {
     // do nothing if object is already undefined
-	if (Z_TYPE_P(_val) == IS_UNDEF) return;
+    if (Z_TYPE_P(_val) == IS_UNDEF) return;
 
     // call destructor
     zval_ptr_dtor(_val);
@@ -1109,7 +1112,7 @@ Value &Value::setType(Type type) &
     if (this->type() == type) return *this;
 
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    SEPARATE_ZVAL_NOREF(_val);
 
     // run the conversion, when it fails we throw a fatal error that ends up in PHP space
     switch (type) {
@@ -1629,7 +1632,7 @@ Value Value::get(const char *key, int size) const
 void Value::setRaw(int index, const Value &value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    SEPARATE_ZVAL_NOREF(_val);
 
     // add the value (this will decrement refcount on any current variable)
     add_index_zval(_val, index, value._val);
@@ -1678,7 +1681,7 @@ void Value::setRaw(const char *key, int size, const Value &value)
     if (isObject())
     {
         // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(_val);
+        SEPARATE_ZVAL_NOREF(_val);
 
         // update the property
 #if PHP_VERSION_ID < 70100
@@ -1696,7 +1699,7 @@ void Value::setRaw(const char *key, int size, const Value &value)
     else
     {
         // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(_val);
+        SEPARATE_ZVAL_NOREF(_val);
 
         // add the value (this will reduce the refcount of the current value)
         add_assoc_zval_ex(_val, key, size, value._val);
@@ -1742,7 +1745,7 @@ void Value::unset(int index)
     if (!isArray()) return;
 
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    SEPARATE_ZVAL_NOREF(_val);
 
     // remove the index
     zend_hash_index_del(Z_ARRVAL_P(_val.dereference()), index);
@@ -1759,7 +1762,7 @@ void Value::unset(const char *key, int size)
     if (isObject())
     {
         // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(_val);
+        SEPARATE_ZVAL_NOREF(_val);
 
         // in the zend header files, unsetting properties is redirected to setting it to null...
         add_property_null_ex(_val, key, size);
@@ -1767,7 +1770,7 @@ void Value::unset(const char *key, int size)
     else if (isArray())
     {
         // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(_val);
+        SEPARATE_ZVAL_NOREF(_val);
 
         // remove the index
         zend_hash_del(Z_ARRVAL_P(_val.dereference()), String(key, size));
@@ -1875,4 +1878,6 @@ std::ostream &operator<<(std::ostream &stream, const Value &value)
  *  End of namespace
  */
 }
+
+
 

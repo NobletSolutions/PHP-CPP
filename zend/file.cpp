@@ -5,6 +5,7 @@
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2014 Copernica BV
+ *
  */
 
 /**
@@ -26,10 +27,16 @@ namespace Php {
  *  @param  name        the filename
  *  @param  size        length of the filename
  */
-File::File(const char *name, size_t size)
+File::File(const _zend_string *name, size_t size)
 {
-    // resolve the path
-    _path = zend_resolve_path(name, size);
+    /**
+    *
+    * Assign `const` zend_string as a non-const variable to resolve typing error.
+    * error: invalid conversion from ‘const zend_string*’ {aka ‘const _zend_string*’} to ‘zend_string*’ {aka ‘_zend_string*’}
+    * zend_resolve_path now only accepts the filename argument.
+    */
+    zend_string *tmp_str = zend_string_init_fast(ZSTR_VAL(name), ZSTR_LEN(name));
+    _path = zend_resolve_path(tmp_str);
 }
 
 /**
@@ -53,11 +60,16 @@ bool File::compile()
     // is the file already compiled?
     if (_opcodes) return _opcodes->valid();
 
-    // we are going to open the file
+    // open the file
     zend_file_handle fileHandle;
+    /**
+     *  zend_stream_open now only accepts the fileHandle object
+     *  Filename must now be set through the object path.
+    */
+    fileHandle.filename = _path;
 
     // open the file
-    if (zend_stream_open(ZSTR_VAL(_path), &fileHandle) == FAILURE) return false;
+    if (zend_stream_open(&fileHandle) == FAILURE) return false;
 
     // make sure the path name is stored in the handle (@todo: is this necessary? do we need the copy?)
     if (!fileHandle.opened_path) fileHandle.opened_path = zend_string_copy(_path);
