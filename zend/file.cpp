@@ -26,6 +26,26 @@ namespace Php {
  *  @param  name        the filename
  *  @param  size        length of the filename
  */
+File::File(const char *name, size_t size)
+{
+    /**
+     * Assign `const` zend_string as a non-const variable to resolve typing error.
+     * error: invalid conversion from ‘const zend_string*’ {aka ‘const _zend_string*’} to ‘zend_string*’ {aka ‘_zend_string*’}
+     * zend_resolve_path now only accepts the filename argument.
+     */
+    zend_string *tmp_str = zend_string_init_fast(name, size);
+    _path = zend_resolve_path(tmp_str);
+}
+
+/**
+ *  Constructor
+ *
+ *  The constructor receives a filename as parameter. It uses the normal
+ *  PHP include path resolve algorithms to find the location of the file.
+ *
+ *  @param  name        the filename
+ *  @param  size        length of the filename
+ */
 File::File(const _zend_string *name, size_t size)
 {
     /**
