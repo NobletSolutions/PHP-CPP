@@ -328,7 +328,11 @@ public:
      *  @param  object_ptr  To be filled with the object on which the method is to be called
      *  @return int
      */
+#if PHP_VERSION_ID < 80000
+    static int getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry, zend_function **func, zend_object **object_ptr);
+#else
     static int getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry, zend_function **func, zend_object **object_ptr, zend_bool check_only);
+#endif
 
     /**
      *  Function to cast the object to a different type

@@ -285,7 +285,11 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, zend_string *
  *  @param  object_ptr
  *  @return int
  */
+#if PHP_VERSION_ID < 80000
+int ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr)
+#else
 int ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr, zend_bool check_only)
+#endif
 {
     // it is really unbelievable how the Zend engine manages to implement every feature
     // in a complete different manner. You would expect the __invoke() and the
